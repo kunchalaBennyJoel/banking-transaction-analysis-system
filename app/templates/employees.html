@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block page_content %}
+  <div class="page-intro page-intro-compact">
+    <div><p class="eyebrow">ADMINISTRATION</p><h1>Employee accounts</h1><p class="intro-copy">Create employee access and deactivate accounts that should no longer sign in.</p></div>
+  </div>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}<p class="message {{ 'message-error' if category == 'error' else 'message-success' }}" role="status">{{ message }}</p>{% endfor %}
+  {% endwith %}
+  <section class="section-block" aria-labelledby="create-employee-heading">
+    <div class="section-heading"><h2 id="create-employee-heading">Create an account</h2><p class="section-context">Passwords are stored as one-way hashes and are never displayed.</p></div>
+    <form method="post" action="{{ url_for('auth.manage_employees') }}" class="employee-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="filter-field"><label for="new-employee-id">Employee ID</label><input id="new-employee-id" name="employee_id" type="text" minlength="3" maxlength="64" pattern="[A-Za-z0-9][A-Za-z0-9._-]{2,63}" autocomplete="off" required></div>
+      <div class="filter-field"><label for="new-password">Initial password</label><input id="new-password" name="password" type="password" minlength="12" maxlength="1024" autocomplete="new-password" required></div>
+      <div class="filter-field"><label for="new-role">Role</label><select id="new-role" name="role"><option value="employee">Employee</option><option value="admin">Admin</option></select></div>
+      <button class="button button-primary" type="submit">Create employee</button>
+    </form>
+  </section>
+  <section class="section-block" aria-labelledby="employees-list-heading">
+    <div class="section-heading"><h2 id="employees-list-heading">Existing employees</h2><p class="section-context">Inactive accounts cannot authenticate.</p></div>
+    <div class="table-scroll">
+      <table class="transaction-table">
+        <caption class="sr-only">Employee accounts and active status</caption>
+        <thead><tr><th scope="col">Employee ID</th><th scope="col">Role</th><th scope="col">Created (UTC)</th><th scope="col">Status</th><th scope="col">Action</th></tr></thead>
+        <tbody>
+          {% for employee in employees %}
+            <tr>
+              <td>{{ employee.employee_id }}</td>
+              <td>{{ employee.role }}</td>
+              <td>{{ employee.created_at.strftime('%Y-%m-%d %H:%M UTC') }}</td>
+              <td>{{ 'Active' if employee.is_active else 'Inactive' }}</td>
+              <td>
+                {% if employee.is_active and employee.id != current_employee.id %}
+                  <form method="post" action="{{ url_for('auth.deactivate_employee', employee_pk=employee.id) }}" class="inline-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button class="button button-quiet" type="submit">Deactivate</button>
+                  </form>
+                {% else %}—{% endif %}
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="5">No employee accounts exist.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+{% endblock %}

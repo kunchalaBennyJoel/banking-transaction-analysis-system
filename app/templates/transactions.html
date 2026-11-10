@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block page_content %}
+  <div class="page-intro page-intro-compact">
+    <div>
+      <p class="eyebrow">READ-ONLY RECORDS</p>
+      <h1>Transactions</h1>
+      <p class="intro-copy">Filter and inspect individual transaction events.</p>
+    </div>
+    <p class="dataset-note"><strong>Synthetic demonstration data</strong><br>Transfers are stored and displayed once per event.</p>
+  </div>
+
+  <section class="section-block transaction-workspace" aria-labelledby="transactions-heading">
+    <div class="section-heading explorer-heading">
+      <div><p class="eyebrow">TRANSACTION EXPLORER</p><h2 id="transactions-heading">Records</h2></div>
+      <p class="section-context">Amounts are event values, not balances or profit.</p>
+    </div>
+    <form id="account-search-form" class="filters-form account-search-form">
+      <div class="filter-field account-search-field"><label for="account-number">Account number</label><input id="account-number" name="account_number" type="text" maxlength="24" autocomplete="off" spellcheck="false" placeholder="e.g. SYN-ACCT-0001" required></div>
+      <div class="filter-actions"><button class="button button-primary" type="submit">Search account</button><button class="button button-quiet" id="clear-account-search" type="button" hidden>Clear search</button></div>
+    </form>
+    <p class="filter-hint">Search uses synthetic demonstration account references.</p>
+    <div id="account-result" hidden>
+      <p id="account-result-label" class="active-filters" aria-live="polite"></p>
+      <dl id="account-summary" class="analysis-metrics account-summary">
+        <div><dt>Transactions in current filters</dt><dd id="account-transaction-count">0</dd></div>
+        <div><dt>Successful debits (INR)</dt><dd id="account-debit-total">₹0.00</dd></div>
+        <div><dt>Successful credits (INR)</dt><dd id="account-credit-total">₹0.00</dd></div>
+      </dl>
+    </div>
+    <form id="filters-form" class="filters-form">
+      <div class="filter-field"><label for="filter-status">Status</label><select id="filter-status" name="status"><option value="">All statuses</option><option value="successful">Successful</option><option value="pending">Pending</option><option value="failed">Failed</option></select></div>
+      <div class="filter-field"><label for="filter-type">Transaction type</label><select id="filter-type" name="transaction_type"><option value="">All types</option><option value="deposit">Deposit</option><option value="withdrawal">Withdrawal</option><option value="transfer">Transfer</option><option value="payment">Payment</option></select></div>
+      <div class="filter-field"><label for="filter-channel">Channel</label><select id="filter-channel" name="channel"><option value="">All channels</option><option value="UPI">UPI</option><option value="ATM">ATM</option><option value="BRANCH">Branch</option><option value="UNKNOWN">Not recorded</option></select></div>
+      <div class="filter-field"><label for="filter-start">From date (UTC, inclusive)</label><input id="filter-start" name="start_date" type="date" max="2026-10-18" value="2025-01-01"></div>
+      <div class="filter-field"><label for="filter-end">Through date (UTC, inclusive)</label><input id="filter-end" name="end_date" type="date" max="2026-10-18" value="2025-01-31"></div>
+      <div class="filter-field filter-page-size"><label for="filter-page-size">Rows per page</label><select id="filter-page-size" name="page_size"><option value="10">10</option><option value="25" selected>25</option><option value="50">50</option><option value="100">100</option></select></div>
+      <div class="filter-actions"><button class="button button-primary" type="submit">Apply filters</button><button class="button button-quiet" id="reset-filters" type="button">Reset filters</button></div>
+    </form>
+    <p class="filter-hint">Dates are limited to October 18, 2026 (UTC). The visible end date is included; requests use the following UTC midnight as the API's exclusive end boundary.</p>
+    <div class="export-controls" aria-label="Export filtered transactions">
+      <div><strong>Export filtered transactions</strong><p>Exports all matching records, up to 10,000 transactions; pagination does not limit the export.</p></div>
+      <div class="export-actions">
+        <a class="button button-quiet transaction-export" data-export-format="csv" href="/api/transactions/export?format=csv">Download CSV</a>
+        <a class="button button-quiet transaction-export" data-export-format="pdf" href="/api/transactions/export?format=pdf">Download PDF</a>
+        <a class="button button-quiet transaction-export" data-export-format="docx" href="/api/transactions/export?format=docx">Download Word</a>
+      </div>
+    </div>
+    <p id="active-filters" class="active-filters" aria-live="polite"></p>
+    <div id="transactions-status" class="inline-status" role="status" aria-live="polite">Loading transactions…</div>
+    <div id="transactions-error" class="message message-error" role="alert" hidden></div>
+    <div class="table-scroll" aria-busy="true">
+      <table class="transaction-table">
+        <caption class="sr-only">Read-only transactions matching the selected filters</caption>
+        <thead><tr><th scope="col">Reference</th><th scope="col">Occurred (UTC)</th><th scope="col">Type</th><th scope="col">Channel</th><th scope="col">Accounts</th><th scope="col">Status</th><th scope="col" class="amount-column">Amount</th></tr></thead>
+        <tbody id="transactions-body"></tbody>
+      </table>
+      <p id="transactions-empty" class="table-empty" role="status" hidden>No transactions match these filters.</p>
+    </div>
+    <div class="table-footer">
+      <p id="pagination-summary" class="pagination-summary">—</p>
+      <nav class="pagination-controls" aria-label="Transaction pages"><button id="previous-page" class="button button-quiet" type="button" disabled>Previous</button><span id="pagination-page" aria-live="polite">Page 1</span><button id="next-page" class="button button-quiet" type="button" disabled>Next</button></nav>
+    </div>
+  </section>
+{% endblock %}

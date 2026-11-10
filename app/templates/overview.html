@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block page_content %}
+  <div class="page-intro">
+    <div>
+      <p class="eyebrow">DATASET OVERVIEW</p>
+      <h1>Transaction overview</h1>
+      <p class="intro-copy">A concise view of recorded activity through October 18, 2026 (UTC).</p>
+    </div>
+    <p class="dataset-note"><strong>Synthetic demonstration data</strong><br>Values describe transaction events, not account balances or profit. Analytics do not establish fraud.</p>
+  </div>
+
+  <section class="section-block" aria-labelledby="summary-heading">
+    <div class="section-heading">
+      <div><p class="eyebrow">THROUGH OCTOBER 18, 2026 · UTC</p><h2 id="summary-heading">Summary</h2></div>
+      <p class="section-context">Counts include all statuses; monetary totals include successful events only.</p>
+    </div>
+    <div id="overview-status" class="inline-status" role="status" aria-live="polite">Loading summary through October 18, 2026…</div>
+    <div id="overview-error" class="message message-error" role="alert" hidden></div>
+    <div id="overview-metrics" class="metrics-grid" aria-busy="true" hidden>
+      <article class="metric"><h3>Total transactions</h3><p id="metric-total" class="metric-value">—</p><p class="metric-detail">All statuses</p></article>
+      <article class="metric"><h3>Successful transactions</h3><p id="metric-successful-count" class="metric-value">—</p><p class="metric-detail">Status: successful</p></article>
+      <article class="metric"><h3>Successful transaction value</h3><p id="metric-successful-value" class="metric-value metric-money">—</p><p id="metric-currency" class="metric-detail">INR · successful transactions only</p></article>
+      <article class="metric"><h3>Average successful amount</h3><p id="metric-average" class="metric-value metric-money">—</p><p class="metric-detail">Per successful transaction</p></article>
+    </div>
+  </section>
+
+  <section class="section-block" aria-labelledby="overview-analytics-heading">
+    <div class="section-heading">
+      <div><p class="eyebrow">THROUGH OCTOBER 18, 2026 · UTC</p><h2 id="overview-analytics-heading">Activity patterns</h2></div>
+      <p class="section-context">Daily volume, status, and type counts include every transaction status.</p>
+    </div>
+    <div class="chart-grid">
+      <article class="chart-panel chart-panel-wide" aria-labelledby="overview-volume-title">
+        <div class="chart-heading"><div><h3 id="overview-volume-title">Daily transaction volume</h3><p>Events per UTC day · all statuses · through October 18, 2026</p></div></div>
+        <div class="chart-wrap"><canvas id="overview-volume-chart" role="img" aria-label="Daily transaction counts through October 18, 2026 in UTC" aria-describedby="overview-volume-description"></canvas></div>
+        <p id="overview-volume-empty" class="chart-empty" role="status" hidden></p>
+        <div id="overview-volume-error" class="message message-error" role="alert" hidden></div>
+        <div id="overview-volume-description" class="sr-only"></div>
+      </article>
+      <article class="chart-panel" aria-labelledby="overview-status-title">
+        <div class="chart-heading"><div><h3 id="overview-status-title">Transactions by status</h3><p>Event count through October 18, 2026 · all statuses</p></div></div>
+        <div class="chart-wrap chart-wrap-compact"><canvas id="overview-status-chart" role="img" aria-label="Transaction counts through October 18, 2026 by status" aria-describedby="overview-status-description"></canvas></div>
+        <p id="overview-status-empty" class="chart-empty" role="status" hidden></p>
+        <div id="overview-status-error" class="message message-error" role="alert" hidden></div>
+        <div id="overview-status-description" class="sr-only"></div>
+      </article>
+      <article class="chart-panel" aria-labelledby="overview-type-title">
+        <div class="chart-heading"><div><h3 id="overview-type-title">Transactions by type</h3><p>Event count through October 18, 2026 · all statuses</p></div></div>
+        <div class="chart-wrap chart-wrap-compact"><canvas id="overview-type-chart" role="img" aria-label="Transaction counts through October 18, 2026 by type" aria-describedby="overview-type-description"></canvas></div>
+        <p id="overview-type-empty" class="chart-empty" role="status" hidden></p>
+        <div id="overview-type-error" class="message message-error" role="alert" hidden></div>
+        <div id="overview-type-description" class="sr-only"></div>
+      </article>
+    </div>
+  </section>
+{% endblock %}

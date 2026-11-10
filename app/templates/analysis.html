@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block page_content %}
+  <div class="page-intro page-intro-compact">
+    <div>
+      <p class="eyebrow">DATE-FILTERED ANALYSIS</p>
+      <h1>Analysis</h1>
+      <p class="intro-copy">Explore event volume and successful transaction values over a UTC date range.</p>
+    </div>
+    <p class="dataset-note"><strong>Synthetic demonstration data</strong><br>Amounts are displayed in INR (₹) without conversion. Totals describe successful transaction events, not balances or profit.</p>
+  </div>
+
+  <section class="section-block analysis-controls" aria-labelledby="analysis-range-heading">
+    <div class="section-heading">
+      <div><p class="eyebrow">DATE WINDOW</p><h2 id="analysis-range-heading">Choose a period</h2></div>
+      <p class="section-context">Counts include all statuses; amount metrics include successful events only.</p>
+    </div>
+    <form id="analysis-form" class="filters-form analysis-form">
+      <div class="filter-field"><label for="analysis-start">From date (UTC, inclusive)</label><input id="analysis-start" name="start_date" type="date" max="2026-10-18" value="2025-01-01" required></div>
+      <div class="filter-field"><label for="analysis-end">Through date (UTC, inclusive)</label><input id="analysis-end" name="end_date" type="date" max="2026-10-18" value="2025-01-31" required></div>
+      <div class="filter-actions"><button class="button button-primary" type="submit">Update analysis</button><button class="button button-quiet" id="reset-analysis" type="button">Reset dates</button></div>
+    </form>
+    <p class="filter-hint">Dates are limited to October 18, 2026 (UTC). The visible end date is included; the request uses the next UTC midnight as the API's exclusive end boundary.</p>
+    <p id="analysis-period" class="active-filters" aria-live="polite">Selected period: January 1–31, 2025 (UTC).</p>
+    <div id="analysis-status" class="inline-status" role="status" aria-live="polite"></div>
+    <div id="analysis-error" class="message message-error" role="alert" hidden></div>
+  </section>
+
+  <section class="section-block" aria-labelledby="analysis-metrics-heading">
+    <div class="section-heading">
+      <div><p class="eyebrow">SELECTED PERIOD</p><h2 id="analysis-metrics-heading">Transaction metrics</h2></div>
+      <p id="analysis-scope" class="section-context">—</p>
+    </div>
+    <dl id="analysis-metrics" class="analysis-metrics" aria-busy="true" hidden>
+      <div><dt>Total transactions</dt><dd id="analysis-total">—</dd><small>All statuses</small></div>
+      <div><dt>Successful transactions</dt><dd id="analysis-success-count">—</dd><small>Successful status only</small></div>
+      <div><dt>Successful transaction value</dt><dd id="analysis-success-value">—</dd><small>Successful events only</small></div>
+      <div><dt>Average successful amount</dt><dd id="analysis-average">—</dd><small>Per successful event</small></div>
+      <div><dt>Successful deposits</dt><dd id="analysis-deposits">—</dd><small>Successful deposit events</small></div>
+      <div><dt>Successful withdrawals</dt><dd id="analysis-withdrawals">—</dd><small>Successful withdrawal events</small></div>
+    </dl>
+  </section>
+
+  <section class="section-block" aria-labelledby="analysis-charts-heading">
+    <div class="section-heading">
+      <div><p class="eyebrow">SELECTED PERIOD · UTC</p><h2 id="analysis-charts-heading">Activity patterns</h2></div>
+      <p class="section-context">All three charts use the selected range; event counts include all statuses.</p>
+    </div>
+    <div class="chart-grid">
+      <article class="chart-panel chart-panel-wide" aria-labelledby="analysis-volume-title">
+        <div class="chart-heading"><div><h3 id="analysis-volume-title">Daily transaction volume</h3><p>Events per UTC day · all statuses</p></div></div>
+        <div class="chart-wrap"><canvas id="analysis-volume-chart" role="img" aria-label="Daily transaction counts for the selected date range" aria-describedby="analysis-volume-description"></canvas></div>
+        <p id="analysis-volume-empty" class="chart-empty" role="status" hidden></p>
+        <div id="analysis-volume-error" class="message message-error" role="alert" hidden></div>
+        <div id="analysis-volume-description" class="sr-only"></div>
+      </article>
+      <article class="chart-panel" aria-labelledby="analysis-status-title">
+        <div class="chart-heading"><div><h3 id="analysis-status-title">Transactions by status</h3><p>Selected-period event count · all statuses</p></div></div>
+        <div class="chart-wrap chart-wrap-compact"><canvas id="analysis-status-chart" role="img" aria-label="Selected-period transaction counts by status" aria-describedby="analysis-status-description"></canvas></div>
+        <p id="analysis-status-empty" class="chart-empty" role="status" hidden></p>
+        <div id="analysis-status-error" class="message message-error" role="alert" hidden></div>
+        <div id="analysis-status-description" class="sr-only"></div>
+      </article>
+      <article class="chart-panel" aria-labelledby="analysis-type-title">
+        <div class="chart-heading"><div><h3 id="analysis-type-title">Transactions by type</h3><p>Selected-period event count · all statuses</p></div></div>
+        <div class="chart-wrap chart-wrap-compact"><canvas id="analysis-type-chart" role="img" aria-label="Selected-period transaction counts by type" aria-describedby="analysis-type-description"></canvas></div>
+        <p id="analysis-type-empty" class="chart-empty" role="status" hidden></p>
+        <div id="analysis-type-error" class="message message-error" role="alert" hidden></div>
+        <div id="analysis-type-description" class="sr-only"></div>
+      </article>
+    </div>
+  </section>
+  <section class="section-block" aria-labelledby="analysis-channels-heading">
+    <div class="section-heading">
+      <div><p class="eyebrow">SELECTED PERIOD</p><h2 id="analysis-channels-heading">Transactions by channel</h2></div>
+      <p class="section-context">Historical transactions have no recorded channel.</p>
+    </div>
+    <dl id="analysis-channels" class="analysis-metrics channel-breakdown">
+      <div><dt>UPI</dt><dd id="analysis-channel-upi">—</dd><a class="button button-quiet channel-export" data-channel="UPI" href="/api/transactions/export?channel=UPI">Download CSV</a></div>
+      <div><dt>ATM</dt><dd id="analysis-channel-atm">—</dd><a class="button button-quiet channel-export" data-channel="ATM" href="/api/transactions/export?channel=ATM">Download CSV</a></div>
+      <div><dt>Branch</dt><dd id="analysis-channel-branch">—</dd><a class="button button-quiet channel-export" data-channel="BRANCH" href="/api/transactions/export?channel=BRANCH">Download CSV</a></div>
+      <div><dt>Not recorded</dt><dd id="analysis-channel-unknown">—</dd><a class="button button-quiet channel-export" data-channel="UNKNOWN" href="/api/transactions/export?channel=UNKNOWN">Download CSV</a></div>
+    </dl>
+  </section>
+{% endblock %}
